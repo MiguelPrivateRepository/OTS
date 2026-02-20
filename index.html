@@ -10,7 +10,6 @@ body {
   background: #f5f5f5;
   padding: 20px;
 }
-
 .box {
   background: #fff;
   padding: 15px;
@@ -18,12 +17,10 @@ body {
   max-width: 600px;
   box-shadow: 0 0 8px rgba(0,0,0,0.1);
 }
-
 label {
   display: block;
   margin-top: 10px;
 }
-
 button {
   margin-top: 15px;
   padding: 8px 15px;
@@ -31,7 +28,6 @@ button {
 }
 </style>
 </head>
-
 <body>
 
 <h1>Nota de Serviço</h1>
@@ -55,6 +51,11 @@ button {
 <script>
 const pdfUrl = "Modelo_Impressão_Vazio.pdf"; // PDF na mesma pasta
 
+// Função para converter Y do Illustrator (topo-esq) para pdf-lib (canto-inf-esq)
+function yFromTop(yTop, pageHeight) {
+  return pageHeight - yTop;
+}
+
 async function carregarPDF() {
   const res = await fetch(pdfUrl);
   if (!res.ok) throw new Error("Não foi possível carregar o PDF");
@@ -66,11 +67,15 @@ document.getElementById("gerar").addEventListener("click", async () => {
     const buffer = await carregarPDF();
     const pdfDoc = await PDFLib.PDFDocument.load(buffer);
     const page = pdfDoc.getPages()[0];
+    const pageHeight = page.getHeight(); // altura do PDF em pontos
 
-    // Coordenadas manuais do texto
-    page.drawText(cliente.value, { x: 50, y: 700, size: 12 });
-    page.drawText(servico.value, { x: 50, y: 680, size: 12 });
-    page.drawText(obs.value, { x: 50, y: 660, size: 12 });
+    // Exemplo com coordenadas do Illustrator
+    // SERVIÇOS PRESTADOS: X=24.76, Y=237.72 (topo-esq)
+    page.drawText(servico.value, { x: 24.76, y: yFromTop(237.72, pageHeight), size: 12 });
+
+    // Outros campos (exemplo) – ajusta X/Y conforme Illustrator
+    // page.drawText(cliente.value, { x: 50, y: yFromTop(200, pageHeight), size: 12 });
+    // page.drawText(obs.value, { x: 50, y: yFromTop(180, pageHeight), size: 12 });
 
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
