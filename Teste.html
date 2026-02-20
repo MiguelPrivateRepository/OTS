@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Notas de Serviço</title>
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+</head>
+
+<body>
+
+<h1>Nota de Serviço</h1>
+
+<label>Cliente:
+  <input id="cliente" type="text">
+</label><br>
+
+<label>Serviço:
+  <input id="servico" type="text">
+</label><br>
+
+<label>Observações:
+  <input id="obs" type="text">
+</label><br><br>
+
+<button id="gerar">Gerar PDF</button>
+
+<script>
+const pdfUrl = "./Modelo_Impressão_Vazio.pdf";
+
+async function carregarPDF() {
+  const res = await fetch(pdfUrl);
+  if (!res.ok) throw new Error("Não foi possível carregar o PDF");
+  return await res.arrayBuffer();
+}
+
+document.getElementById("gerar").addEventListener("click", async () => {
+  try {
+    const buffer = await carregarPDF();
+    const pdfDoc = await PDFLib.PDFDocument.load(buffer);
+    const page = pdfDoc.getPages()[0];
+
+    page.drawText(cliente.value, { x: 50, y: 700, size: 12 });
+    page.drawText(servico.value, { x: 50, y: 680, size: 12 });
+    page.drawText(obs.value, { x: 50, y: 660, size: 12 });
+
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Nota_Servico.pdf";
+    link.click();
+  } catch (e) {
+    alert("Erro ao gerar o PDF");
+    console.error(e);
+  }
+});
+</script>
+
+</body>
+</html>
