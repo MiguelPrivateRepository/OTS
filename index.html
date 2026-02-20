@@ -24,10 +24,10 @@ label {
 }
 textarea {
   width: 100%;
-  height: 90px; /* suficiente para 5 linhas */
+  font-size: 10px; /* fonte mais pequena */
+  line-height: 11px; /* espaçamento mais compacto */
   resize: none;
-  font-size: 11px; /* fonte menor */
-  line-height: 13px; /* espaçamento mais estreito */
+  overflow: hidden;
 }
 button {
   margin-top: 15px;
@@ -42,22 +42,22 @@ button {
 
 <div class="box">
   <label>Serviços Prestados:
-    <textarea id="servicos" maxlength="500"></textarea>
+    <textarea id="servicos" rows="4" maxlength="300" placeholder="Máx 4 linhas"></textarea>
   </label>
 
   <button id="gerar">Gerar PDF</button>
 </div>
 
 <script>
-const pdfUrl = "Modelo_Impressão_Vazio.pdf"; // PDF na mesma pasta
+const pdfUrl = "Modelo_Impressão_Vazio.pdf";
 
 // Converte Y do Illustrator (topo-esq) para pdf-lib (canto-inf-esq)
 function yFromTop(yTop, pageHeight) {
   return pageHeight - yTop;
 }
 
-// Quebra o texto em linhas, limitando a 5 linhas
-function splitTextLines(text, maxCharsPerLine = 50, maxLines = 5) {
+// Quebra texto em linhas e limita a 4 linhas
+function splitTextLines(text, maxCharsPerLine = 50, maxLines = 4) {
   const words = text.split(' ');
   const lines = [];
   let line = '';
@@ -74,6 +74,15 @@ function splitTextLines(text, maxCharsPerLine = 50, maxLines = 5) {
   return lines;
 }
 
+// Limita o número de linhas no textarea em tempo real
+const textarea = document.getElementById("servicos");
+textarea.addEventListener("input", () => {
+  const lines = textarea.value.split("\n");
+  if (lines.length > 4) {
+    textarea.value = lines.slice(0,4).join("\n");
+  }
+});
+
 async function carregarPDF() {
   const res = await fetch(pdfUrl);
   if (!res.ok) throw new Error("Não foi possível carregar o PDF");
@@ -87,15 +96,15 @@ document.getElementById("gerar").addEventListener("click", async () => {
     const page = pdfDoc.getPages()[0];
     const pageHeight = page.getHeight();
 
-    const servicosText = document.getElementById("servicos").value;
-    const servicosLines = splitTextLines(servicosText, 50, 5); // 5 linhas máximo
+    const servicosText = textarea.value;
+    const servicosLines = splitTextLines(servicosText, 50, 4); // máximo 4 linhas
     const startX = 24.76;
     const startY = yFromTop(245, pageHeight);
-    const lineHeight = 11; // fonte menor + espaçamento mais estreito
+    const lineHeight = 10; // fonte pequena e espaçamento compacto
 
     // Desenhar cada linha no PDF
     for (let i = 0; i < servicosLines.length; i++) {
-      page.drawText(servicosLines[i], { x: startX, y: startY - i*lineHeight, size: 11 });
+      page.drawText(servicosLines[i], { x: startX, y: startY - i*lineHeight, size: 10 });
     }
 
     // Salvar e gerar PDF
