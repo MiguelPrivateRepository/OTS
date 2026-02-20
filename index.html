@@ -53,7 +53,7 @@ const pdfUrl = "Modelo_Impressão_Vazio.pdf"; // PDF na mesma pasta
 
 // ===== Configurações =====
 const fontSize = 8;    // tamanho do texto no PDF
-const lineHeight = 4;  // espaçamento entre linhas no PDF
+const lineHeight = 1;  // espaçamento entre linhas no PDF
 
 // Converte Y do Illustrator (topo-esq) para pdf-lib (canto-inf-esq)
 function yFromTop(yTop, pageHeight) {
@@ -126,4 +126,5 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
 
