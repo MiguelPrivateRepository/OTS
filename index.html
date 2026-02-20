@@ -24,8 +24,8 @@ label {
 }
 textarea {
   width: 100%;
-  font-size: 10px;      /* tamanho do texto visível no formulário */
-  line-height: 11px;    /* espaçamento entre linhas no formulário */
+  font-size: 10px;
+  line-height: 11px;
   resize: none;
   overflow: hidden;
 }
@@ -51,34 +51,7 @@ button {
 <script>
 const pdfUrl = "Modelo_Impressão_Vazio.pdf"; // PDF na mesma pasta
 
-// ===== Configurações =====
-const fontSize = 8;    // tamanho do texto no PDF
-const lineHeight = 20;  // espaçamento entre linhas no PDF
-
-// Converte Y do Illustrator (topo-esq) para pdf-lib (canto-inf-esq)
-function yFromTop(yTop, pageHeight) {
-  return pageHeight - yTop;
-}
-
-// Quebra texto em linhas e limita a 4 linhas
-function splitTextLines(text, maxCharsPerLine = 50, maxLines = 4) {
-  const words = text.split(' ');
-  const lines = [];
-  let line = '';
-  for (const word of words) {
-    if ((line + word).length > maxCharsPerLine) {
-      lines.push(line.trim());
-      line = word + ' ';
-      if (lines.length >= maxLines) break;
-    } else {
-      line += word + ' ';
-    }
-  }
-  if (line.trim() && lines.length < maxLines) lines.push(line.trim());
-  return lines;
-}
-
-// Limita o número de linhas no textarea em tempo real
+// Limita o textarea a 4 linhas
 const textarea = document.getElementById("servicos");
 textarea.addEventListener("input", () => {
   const lines = textarea.value.split("\n");
@@ -97,26 +70,37 @@ document.getElementById("gerar").addEventListener("click", async () => {
   try {
     const buffer = await carregarPDF();
     const pdfDoc = await PDFLib.PDFDocument.load(buffer);
-    const page = pdfDoc.getPages()[0];
-    const pageHeight = page.getHeight();
 
-    const servicosText = textarea.value;
-    const servicosLines = splitTextLines(servicosText, 50, 4); // máximo 4 linhas
-    const startX = 24.76;
-    const startY = yFromTop(245, pageHeight);
-
-    // Desenhar cada linha no PDF com espaçamento compacto
-    for (let i = 0; i < servicosLines.length; i++) {
-      page.drawText(servicosLines[i], { x: startX, y: startY - i * lineHeight, size: fontSize });
+    // Criar campos de formulário
+    const form = pdfDoc.getForm();
+    // Cria TextField (campo de texto) chamado "servicos"
+    let field;
+    try {
+      field = form.getTextField('servicos'); // se já existir
+    } catch {
+      field = form.createTextField('servicos');
     }
 
-    // Salvar e gerar PDF
+    // Define posição e tamanho do campo (X, Y, Largura, Altura)
+    // Coordenadas em PDFLib: X,Y canto inferior esquerdo
+    const startX = 24.76;
+    const startY = 842 - 245 - 50; // altura total PDF A4 = 842pt, altura campo = 50pt
+    const width = 500;
+    const height = 50; 
+
+    field.setText(textarea.value);
+    field.addToPage(pdfDoc.getPages()[0], { x: startX, y: startY, width, height });
+    field.enableMultiline(); // permite várias linhas
+    field.updateAppearances({ fontSize: 8 }); // tamanho da fonte
+
+    // Salvar PDF
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "Nota_Servico.pdf";
     link.click();
+
   } catch (e) {
     alert("Erro ao gerar PDF: " + e.message);
     console.error(e);
@@ -126,6 +110,3 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
-
-
-
