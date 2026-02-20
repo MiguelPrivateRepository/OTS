@@ -4,28 +4,56 @@
 <meta charset="UTF-8">
 <title>Notas de Serviço</title>
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+.box {
+  background: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  max-width: 600px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 8px 15px;
+  cursor: pointer;
+}
+</style>
 </head>
 
 <body>
 
 <h1>Nota de Serviço</h1>
 
-<label>Cliente:
-  <input id="cliente" type="text">
-</label><br>
+<div class="box">
+  <label>Cliente:
+    <input id="cliente" type="text">
+  </label>
 
-<label>Serviço:
-  <input id="servico" type="text">
-</label><br>
+  <label>Serviço:
+    <input id="servico" type="text">
+  </label>
 
-<label>Observações:
-  <input id="obs" type="text">
-</label><br><br>
+  <label>Observações:
+    <input id="obs" type="text">
+  </label>
 
-<button id="gerar">Gerar PDF</button>
+  <button id="gerar">Gerar PDF</button>
+</div>
 
 <script>
-const pdfUrl = "./Modelo_Impressão_Vazio.pdf";
+const pdfUrl = "Modelo_Impressão_Vazio.pdf"; // PDF na mesma pasta
 
 async function carregarPDF() {
   const res = await fetch(pdfUrl);
@@ -39,6 +67,7 @@ document.getElementById("gerar").addEventListener("click", async () => {
     const pdfDoc = await PDFLib.PDFDocument.load(buffer);
     const page = pdfDoc.getPages()[0];
 
+    // Coordenadas manuais do texto
     page.drawText(cliente.value, { x: 50, y: 700, size: 12 });
     page.drawText(servico.value, { x: 50, y: 680, size: 12 });
     page.drawText(obs.value, { x: 50, y: 660, size: 12 });
@@ -51,7 +80,7 @@ document.getElementById("gerar").addEventListener("click", async () => {
     link.download = "Nota_Servico.pdf";
     link.click();
   } catch (e) {
-    alert("Erro ao gerar o PDF");
+    alert("Erro ao gerar PDF: " + e.message);
     console.error(e);
   }
 });
