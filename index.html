@@ -71,27 +71,29 @@ document.getElementById("gerar").addEventListener("click", async () => {
     const buffer = await carregarPDF();
     const pdfDoc = await PDFLib.PDFDocument.load(buffer);
 
-    // Criar campos de formulário
+    // Criar formulário e campo de texto
     const form = pdfDoc.getForm();
-    // Cria TextField (campo de texto) chamado "servicos"
+
     let field;
     try {
-      field = form.getTextField('servicos'); // se já existir
+      field = form.getTextField('servicos');
     } catch {
       field = form.createTextField('servicos');
     }
 
     // Define posição e tamanho do campo (X, Y, Largura, Altura)
-    // Coordenadas em PDFLib: X,Y canto inferior esquerdo
     const startX = 24.76;
-    const startY = 842 - 245 - 50; // altura total PDF A4 = 842pt, altura campo = 50pt
+    const startY = 842 - 245 - 50; // altura A4 = 842pt
     const width = 500;
-    const height = 50; 
+    const height = 50;
 
-    field.setText(textarea.value);
+    field.setText(textarea.value); // preenche o texto
+    field.enableMultiline();       // permite várias linhas
     field.addToPage(pdfDoc.getPages()[0], { x: startX, y: startY, width, height });
-    field.enableMultiline(); // permite várias linhas
-    field.updateAppearances({ fontSize: 8 }); // tamanho da fonte
+
+    // ===== Fonte obrigatória para updateAppearances =====
+    const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+    field.updateAppearances(font, { fontSize: 8 });
 
     // Salvar PDF
     const pdfBytes = await pdfDoc.save();
