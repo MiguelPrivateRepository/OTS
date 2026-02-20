@@ -5,35 +5,11 @@
 <title>Notas de Serviço</title>
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  padding: 20px;
-}
-.box {
-  background: #fff;
-  padding: 15px;
-  border-radius: 6px;
-  max-width: 600px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.1);
-}
-label {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
-}
-textarea {
-  width: 100%;
-  font-size: 10px;
-  line-height: 11px;
-  resize: none;
-  overflow: hidden;
-}
-button {
-  margin-top: 15px;
-  padding: 8px 15px;
-  cursor: pointer;
-}
+body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+.box { background: #fff; padding: 15px; border-radius: 6px; max-width: 600px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+label { display: block; margin-top: 10px; font-weight: bold; }
+textarea { width: 100%; font-size: 10px; line-height: 11px; resize: none; overflow: hidden; }
+button { margin-top: 15px; padding: 8px 15px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -42,7 +18,7 @@ button {
 
 <div class="box">
   <label>Serviços Prestados:
-    <textarea id="servicos" rows="4" maxlength="300" placeholder="Máx 4 linhas"></textarea>
+    <textarea id="servicos" rows="5" maxlength="375" placeholder="Máx 5 linhas"></textarea>
   </label>
 
   <button id="gerar">Gerar PDF</button>
@@ -51,33 +27,26 @@ button {
 <script>
 const pdfUrl = "Modelo_Impressão_Vazio.pdf"; // PDF na mesma pasta
 
-// Limita o textarea a 4 linhas
 const textarea = document.getElementById("servicos");
 textarea.addEventListener("input", () => {
   const lines = textarea.value.split("\n");
-  if (lines.length > 4) {
-    textarea.value = lines.slice(0,4).join("\n");
-  }
+  if (lines.length > 5) textarea.value = lines.slice(0,5).join("\n");
 });
 
 document.getElementById("gerar").addEventListener("click", async () => {
   try {
     const buffer = await fetch(pdfUrl).then(res => res.arrayBuffer());
     const pdfDoc = await PDFLib.PDFDocument.load(buffer);
-
     const page = pdfDoc.getPages()[0];
 
-    // Configurações de fonte e espaçamento
     const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
-    const fontSize = 8;       // tamanho da fonte
-    const lineHeight = 10;    // espaçamento entre linhas
-    const startX = 25;        // coordenada X do campo
-    const startY = 842-245;       // coordenada Y do topo do campo (origem Illustrator)
-    
-    // Quebra o texto em linhas e limita a 4
-    const lines = textarea.value.split("\n").slice(0,4);
+    const fontSize = 8;
+    const lineHeight = 10;
+    const startX = 25;
+    const startY = 842 - 245; // conversão Illustrator -> PDFLib
 
-    // Desenha cada linha manualmente
+    const lines = textarea.value.split("\n").slice(0,5);
+
     for (let i = 0; i < lines.length; i++) {
       page.drawText(lines[i], {
         x: startX,
@@ -87,7 +56,6 @@ document.getElementById("gerar").addEventListener("click", async () => {
       });
     }
 
-    // Salvar PDF
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
@@ -104,4 +72,3 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
-
