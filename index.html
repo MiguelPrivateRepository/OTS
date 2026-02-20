@@ -72,7 +72,7 @@ document.getElementById("gerar").addEventListener("click", async () => {
     const fontSize = 8;       // tamanho da fonte
     const lineHeight = 10;    // espaçamento entre linhas
     const startX = 25;        // coordenada X do campo
-    const startY = 245;       // coordenada Y do topo do campo (origem Illustrator)
+    const startY = 842-245;       // coordenada Y do topo do campo (origem Illustrator)
     
     // Quebra o texto em linhas e limita a 4
     const lines = textarea.value.split("\n").slice(0,4);
@@ -104,3 +104,4 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
