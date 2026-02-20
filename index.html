@@ -24,8 +24,8 @@ label {
 }
 textarea {
   width: 100%;
-  font-size: 10px; /* fonte mais pequena */
-  line-height: 11px; /* espaçamento mais compacto */
+  font-size: 10px; /* fonte visível no formulário */
+  line-height: 11px; /* espaçamento entre linhas no formulário */
   resize: none;
   overflow: hidden;
 }
@@ -49,7 +49,11 @@ button {
 </div>
 
 <script>
-const pdfUrl = "Modelo_Impressão_Vazio.pdf";
+const pdfUrl = "Modelo_Impressão_Vazio.pdf"; // PDF na mesma pasta
+
+// ===== Configurações =====
+const fontSize = 10;   // tamanho do texto no PDF
+const lineHeight = 8;  // espaçamento vertical entre linhas no PDF
 
 // Converte Y do Illustrator (topo-esq) para pdf-lib (canto-inf-esq)
 function yFromTop(yTop, pageHeight) {
@@ -100,11 +104,10 @@ document.getElementById("gerar").addEventListener("click", async () => {
     const servicosLines = splitTextLines(servicosText, 50, 4); // máximo 4 linhas
     const startX = 24.76;
     const startY = yFromTop(245, pageHeight);
-    const lineHeight = 3; // fonte pequena e espaçamento compacto
 
     // Desenhar cada linha no PDF
     for (let i = 0; i < servicosLines.length; i++) {
-      page.drawText(servicosLines[i], { x: startX, y: startY - i*lineHeight, size: 10 });
+      page.drawText(servicosLines[i], { x: startX, y: startY - i * lineHeight, size: fontSize });
     }
 
     // Salvar e gerar PDF
@@ -123,5 +126,3 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
-
-
