@@ -100,7 +100,7 @@ document.getElementById("gerar").addEventListener("click", async () => {
     const servicosLines = splitTextLines(servicosText, 50, 4); // máximo 4 linhas
     const startX = 24.76;
     const startY = yFromTop(245, pageHeight);
-    const lineHeight = 10; // fonte pequena e espaçamento compacto
+    const lineHeight = 7; // fonte pequena e espaçamento compacto
 
     // Desenhar cada linha no PDF
     for (let i = 0; i < servicosLines.length; i++) {
@@ -123,3 +123,4 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
