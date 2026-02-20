@@ -21,6 +21,11 @@ label {
   display: block;
   margin-top: 10px;
 }
+textarea {
+  width: 100%;
+  height: 100px;
+  resize: none;
+}
 button {
   margin-top: 15px;
   padding: 8px 15px;
@@ -37,8 +42,8 @@ button {
     <input id="cliente" type="text">
   </label>
 
-  <label>Serviço:
-    <input id="servico" type="text">
+  <label>Serviços Prestados:
+    <textarea id="servicos"></textarea>
   </label>
 
   <label>Observações:
@@ -56,6 +61,23 @@ function yFromTop(yTop, pageHeight) {
   return pageHeight - yTop;
 }
 
+// Função para quebrar texto em múltiplas linhas
+function splitTextLines(text, maxCharsPerLine = 50) {
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+  for (const word of words) {
+    if ((line + word).length > maxCharsPerLine) {
+      lines.push(line.trim());
+      line = word + ' ';
+    } else {
+      line += word + ' ';
+    }
+  }
+  if (line.trim()) lines.push(line.trim());
+  return lines;
+}
+
 async function carregarPDF() {
   const res = await fetch(pdfUrl);
   if (!res.ok) throw new Error("Não foi possível carregar o PDF");
@@ -67,16 +89,24 @@ document.getElementById("gerar").addEventListener("click", async () => {
     const buffer = await carregarPDF();
     const pdfDoc = await PDFLib.PDFDocument.load(buffer);
     const page = pdfDoc.getPages()[0];
-    const pageHeight = page.getHeight(); // altura do PDF em pontos
+    const pageHeight = page.getHeight(); // altura do PDF
 
-    // Exemplo com coordenadas do Illustrator
-    // SERVIÇOS PRESTADOS: X=24.76, Y=237.72 (topo-esq)
-    page.drawText(servico.value, { x: 24.76, y: yFromTop(237.72, pageHeight), size: 12 });
+    // ===== Campo Serviços Prestados =====
+    const servicosText = document.getElementById("servicos").value;
+    const servicosLines = splitTextLines(servicosText, 50); // quebra automática
+    const maxLines = 5;
+    const lineHeight = 12; // tamanho da fonte
+    const startX = 24.76;
+    const startY = yFromTop(245, pageHeight); // topo do Illustrator
+    for (let i = 0; i < Math.min(servicosLines.length, maxLines); i++) {
+      page.drawText(servicosLines[i], { x: startX, y: startY - i*lineHeight, size: 12 });
+    }
 
-    // Outros campos (exemplo) – ajusta X/Y conforme Illustrator
-    // page.drawText(cliente.value, { x: 50, y: yFromTop(200, pageHeight), size: 12 });
-    // page.drawText(obs.value, { x: 50, y: yFromTop(180, pageHeight), size: 12 });
+    // ===== Outros campos =====
+    page.drawText(document.getElementById("cliente").value, { x: 50, y: yFromTop(200, pageHeight), size: 12 });
+    page.drawText(document.getElementById("obs").value, { x: 50, y: yFromTop(180, pageHeight), size: 12 });
 
+    // ===== Salvar e gerar PDF =====
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
 
