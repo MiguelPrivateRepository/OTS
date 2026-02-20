@@ -20,11 +20,14 @@ body {
 label {
   display: block;
   margin-top: 10px;
+  font-weight: bold;
 }
 textarea {
   width: 100%;
-  height: 100px;
+  height: 90px; /* suficiente para 5 linhas */
   resize: none;
+  font-size: 11px; /* fonte menor */
+  line-height: 13px; /* espaçamento mais estreito */
 }
 button {
   margin-top: 15px;
@@ -38,16 +41,8 @@ button {
 <h1>Nota de Serviço</h1>
 
 <div class="box">
-  <label>Cliente:
-    <input id="cliente" type="text">
-  </label>
-
   <label>Serviços Prestados:
-    <textarea id="servicos"></textarea>
-  </label>
-
-  <label>Observações:
-    <input id="obs" type="text">
+    <textarea id="servicos" maxlength="500"></textarea>
   </label>
 
   <button id="gerar">Gerar PDF</button>
@@ -56,13 +51,13 @@ button {
 <script>
 const pdfUrl = "Modelo_Impressão_Vazio.pdf"; // PDF na mesma pasta
 
-// Função para converter Y do Illustrator (topo-esq) para pdf-lib (canto-inf-esq)
+// Converte Y do Illustrator (topo-esq) para pdf-lib (canto-inf-esq)
 function yFromTop(yTop, pageHeight) {
   return pageHeight - yTop;
 }
 
-// Função para quebrar texto em múltiplas linhas
-function splitTextLines(text, maxCharsPerLine = 50) {
+// Quebra o texto em linhas, limitando a 5 linhas
+function splitTextLines(text, maxCharsPerLine = 50, maxLines = 5) {
   const words = text.split(' ');
   const lines = [];
   let line = '';
@@ -70,11 +65,12 @@ function splitTextLines(text, maxCharsPerLine = 50) {
     if ((line + word).length > maxCharsPerLine) {
       lines.push(line.trim());
       line = word + ' ';
+      if (lines.length >= maxLines) break;
     } else {
       line += word + ' ';
     }
   }
-  if (line.trim()) lines.push(line.trim());
+  if (line.trim() && lines.length < maxLines) lines.push(line.trim());
   return lines;
 }
 
@@ -89,27 +85,22 @@ document.getElementById("gerar").addEventListener("click", async () => {
     const buffer = await carregarPDF();
     const pdfDoc = await PDFLib.PDFDocument.load(buffer);
     const page = pdfDoc.getPages()[0];
-    const pageHeight = page.getHeight(); // altura do PDF
+    const pageHeight = page.getHeight();
 
-    // ===== Campo Serviços Prestados =====
     const servicosText = document.getElementById("servicos").value;
-    const servicosLines = splitTextLines(servicosText, 50); // quebra automática
-    const maxLines = 5;
-    const lineHeight = 12; // tamanho da fonte
+    const servicosLines = splitTextLines(servicosText, 50, 5); // 5 linhas máximo
     const startX = 24.76;
-    const startY = yFromTop(245, pageHeight); // topo do Illustrator
-    for (let i = 0; i < Math.min(servicosLines.length, maxLines); i++) {
-      page.drawText(servicosLines[i], { x: startX, y: startY - i*lineHeight, size: 12 });
+    const startY = yFromTop(245, pageHeight);
+    const lineHeight = 11; // fonte menor + espaçamento mais estreito
+
+    // Desenhar cada linha no PDF
+    for (let i = 0; i < servicosLines.length; i++) {
+      page.drawText(servicosLines[i], { x: startX, y: startY - i*lineHeight, size: 11 });
     }
 
-    // ===== Outros campos =====
-    page.drawText(document.getElementById("cliente").value, { x: 50, y: yFromTop(200, pageHeight), size: 12 });
-    page.drawText(document.getElementById("obs").value, { x: 50, y: yFromTop(180, pageHeight), size: 12 });
-
-    // ===== Salvar e gerar PDF =====
+    // Salvar e gerar PDF
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
-
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "Nota_Servico.pdf";
