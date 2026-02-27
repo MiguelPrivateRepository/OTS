@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Notas de Serviço</title>
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<style>
+body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+.box { background: #fff; padding: 15px; border-radius: 6px; max-width: 600px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+label { display: block; margin-top: 10px; font-weight: bold; }
+textarea { width: 100%; font-size: 10px; line-height: 11px; resize: none; overflow: hidden; }
+button { margin-top: 15px; padding: 8px 15px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<h1>Nota de Serviço</h1>
+
+<div class="box">
+  <label>Serviços Prestados:
+    <textarea id="servicos" rows="5" maxlength="375" placeholder="Máx 5 linhas"></textarea>
+  </label>
+
+  <button id="gerar">Gerar PDF</button>
+</div>
+
+<script>
+const pdfUrl = "Modelo_Impressão_Vazio.pdf"; // PDF na mesma pasta
+
+const textarea = document.getElementById("servicos");
+textarea.addEventListener("input", () => {
+  const lines = textarea.value.split("\n");
+  if (lines.length > 5) textarea.value = lines.slice(0,5).join("\n");
+});
+
+document.getElementById("gerar").addEventListener("click", async () => {
+  try {
+    const buffer = await fetch(pdfUrl).then(res => res.arrayBuffer());
+    const pdfDoc = await PDFLib.PDFDocument.load(buffer);
+    const page = pdfDoc.getPages()[0];
+
+    const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+    const fontSize = 8;
+    const lineHeight = 10;
+    const startX = 25;
+    const startY = 842 - 245; // conversão Illustrator -> PDFLib
+
+    const lines = textarea.value.split("\n").slice(0,5);
+
+    for (let i = 0; i < lines.length; i++) {
+      page.drawText(lines[i], {
+        x: startX,
+        y: startY - i * lineHeight,
+        size: fontSize,
+        font: font,
+      });
+    }
+
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Nota_Servico.pdf";
+    link.click();
+
+  } catch (e) {
+    alert("Erro ao gerar PDF: " + e.message);
+    console.error(e);
+  }
+});
+</script>
+
+</body>
+</html>
