@@ -56,6 +56,34 @@ document.getElementById("gerar").addEventListener("click", async () => {
       });
     }
 
+    // --- TABELA ---
+
+    const tableStartX = 25;
+    const tableStartY = 842 - 360.72; // Data
+    const columnWidth = 184.22;
+    const rowHeight = 10;
+    
+    // Exemplo de dados (depois virão do formulário)
+    const tabela = [
+      ["2026-02-25", "2", "1", "1"],
+      ["2026-02-26", "3", "0.5", "1"],
+    ];
+    
+    // linhas
+    for (let linha = 0; linha < tabela.length; linha++) {
+      // colunas
+      for (let coluna = 0; coluna < 4; coluna++) {
+        const valorDaCelula = tabela[linha][coluna] || "";
+    
+        page.drawText(valorDaCelula, {
+          x: tableStartX + coluna * columnWidth,
+          y: tableStartY - linha * rowHeight,
+          size: fontSize,
+          font: font,
+        });
+      }
+    }
+    
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
@@ -72,4 +100,5 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
 
