@@ -58,12 +58,11 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
     // --- TABELA ---
 
-    const tableStartX = 25;
-    const tableStartY = 842 - 360.72; // Data
-    const columnWidth = 184.22;
-    const rowHeight = 10;
+    const tableX = [7.725, 64.122, 109.97, 155.82];
+    const tableStartY = 842 - 120.90;
+    const rowHeight = 5.01;
     
-    // Exemplo de dados (depois virão do formulário)
+    // exemplo (depois vem do formulário)
     const tabela = [
       ["2026-02-25", "2", "1", "1"],
       ["2026-02-26", "3", "0.5", "1"],
@@ -71,13 +70,15 @@ document.getElementById("gerar").addEventListener("click", async () => {
     
     // linhas
     for (let linha = 0; linha < tabela.length; linha++) {
+      const y = tableStartY - linha * rowHeight;
+    
       // colunas
       for (let coluna = 0; coluna < 4; coluna++) {
-        const valorDaCelula = tabela[linha][coluna] || "";
+        const valor = tabela[linha][coluna] || "";
     
-        page.drawText(valorDaCelula, {
-          x: tableStartX + coluna * columnWidth,
-          y: tableStartY - linha * rowHeight,
+        page.drawText(valor, {
+          x: tableX[coluna],
+          y: y,
           size: fontSize,
           font: font,
         });
@@ -100,5 +101,6 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
 
 
