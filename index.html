@@ -56,13 +56,13 @@ document.getElementById("gerar").addEventListener("click", async () => {
       });
     }
 
-    // --- TABELA (cotas em PIXÉIS, baseline, origem topo-esquerdo) ---
+    // --- TABELA (centrada por largura real da célula) ---
 
-    const tableX = [
-      22.84,
-      181.94,
-      311.81,
-      441.88
+    const tableCellsX = [
+      { x1: 22.84,  x2: 177.37 },
+      { x1: 181.94, x2: 307.39 },
+      { x1: 311.81, x2: 437.61 },
+      { x1: 441.88, x2: 567.88 }
     ];
     
     const tableStartY_px = 342.40;
@@ -76,18 +76,21 @@ document.getElementById("gerar").addEventListener("click", async () => {
       ["2026-02-26", "3", "0.5", "1"],
     ];
     
-    // linhas
     for (let linha = 0; linha < tabela.length; linha++) {
       const yPx = tableStartY_px + linha * rowHeight_px;
       const yPdf = height - yPx;
     
-      // colunas
       for (let coluna = 0; coluna < 4; coluna++) {
+        const cell = tableCellsX[coluna];
+        const cellWidth = cell.x2 - cell.x1;
+    
         page.drawText(tabela[linha][coluna] || "", {
-          x: tableX[coluna],
+          x: cell.x1,
           y: yPdf,
           size: fontSize,
           font: font,
+          maxWidth: cellWidth,
+          align: "center"
         });
       }
     }
@@ -108,6 +111,7 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
 
 
 
