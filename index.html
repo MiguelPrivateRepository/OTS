@@ -56,13 +56,15 @@ document.getElementById("gerar").addEventListener("click", async () => {
       });
     }
 
-    // --- TABELA ---
+    // --- TABELA (origem topo-esquerdo -> PDFLib) ---
 
     const tableX = [7.725, 64.122, 109.97, 155.82];
-    const tableStartY = 842 - 120.90;
+    const tableStartY_Illustrator = 120.90;
     const rowHeight = 5.01;
     
-    // exemplo (depois vem do formulário)
+    const { height } = page.getSize();
+    
+    // exemplo de dados
     const tabela = [
       ["2026-02-25", "2", "1", "1"],
       ["2026-02-26", "3", "0.5", "1"],
@@ -70,7 +72,8 @@ document.getElementById("gerar").addEventListener("click", async () => {
     
     // linhas
     for (let linha = 0; linha < tabela.length; linha++) {
-      const y = tableStartY - linha * rowHeight;
+      const yIllustrator = tableStartY_Illustrator + linha * rowHeight;
+      const yPdf = height - yIllustrator;
     
       // colunas
       for (let coluna = 0; coluna < 4; coluna++) {
@@ -78,7 +81,7 @@ document.getElementById("gerar").addEventListener("click", async () => {
     
         page.drawText(valor, {
           x: tableX[coluna],
-          y: y,
+          y: yPdf,
           size: fontSize,
           font: font,
         });
@@ -101,6 +104,7 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
 
 
 
