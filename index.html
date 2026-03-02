@@ -56,26 +56,22 @@ document.getElementById("gerar").addEventListener("click", async () => {
       });
     }
 
-    // --- TABELA (cotas em mm, origem topo-esquerdo) ---
+    // --- TABELA (cotas em PIXÉIS, origem topo-esquerdo) ---
 
-    const mmToPt = 2.83465;
-    
-    // X das colunas (mm -> pt)
     const tableX = [
-      22.84 * mmToPt,
-      181.94 * mmToPt,
-      311.81 * mmToPt,
-      441.88 * mmToPt
+      22.84,
+      181.94,
+      311.81,
+      441.88
     ];
     
-    // Y inicial e espaçamento (mm)
-    const tableStartY_mm = 342.40;
-    const rowHeight_mm = 13.98;
+    const tableStartY_px = 342.40;
+    const rowHeight_px = 13.98;
     
     const { height } = page.getSize();
     const baselineOffset = fontSize * 0.8; // compensação da baseline
     
-    // exemplo (depois vem do formulário)
+    // exemplo (depois virá do formulário)
     const tabela = [
       ["2026-02-25", "2", "1", "1"],
       ["2026-02-26", "3", "0.5", "1"],
@@ -83,8 +79,8 @@ document.getElementById("gerar").addEventListener("click", async () => {
     
     // linhas
     for (let linha = 0; linha < tabela.length; linha++) {
-      const yMm = tableStartY_mm + linha * rowHeight_mm;
-      const yPdf = height - (yMm * mmToPt) - baselineOffset;
+      const yPx = tableStartY_px + linha * rowHeight_px;
+      const yPdf = height - yPx - baselineOffset;
     
       // colunas
       for (let coluna = 0; coluna < 4; coluna++) {
@@ -113,6 +109,7 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
 
 
 
