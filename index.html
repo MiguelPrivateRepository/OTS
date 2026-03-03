@@ -199,9 +199,15 @@ document.getElementById("gerar").addEventListener("click", async () => {
     
         const textWidth = font.widthOfTextAtSize(texto, fontSize);
         const centerX = colEndX[coluna] - cellWidth / 2;
-    
+        
+        // ajuste fino só para a coluna Data
+        let opticalOffset = 0;
+        if (coluna === 0) {
+          opticalOffset = -1.5; // ajusta entre -1 e -2 se necessário
+        }
+        
         page.drawText(texto, {
-          x: centerX - textWidth / 2,
+          x: centerX - textWidth / 2 + opticalOffset,
           y: firstRowY - linha * rowSpacing,
           size: fontSize,
           font: font,
@@ -225,4 +231,5 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
 
