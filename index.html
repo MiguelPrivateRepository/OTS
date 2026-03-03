@@ -132,12 +132,6 @@ button {
         <td><input id="t_7_2"></td>
         <td><input id="t_7_3"></td>
       </tr>
-      <tr>
-        <td><input id="t_8_0"></td>
-        <td><input id="t_8_1"></td>
-        <td><input id="t_8_2"></td>
-        <td><input id="t_8_3"></td>
-      </tr>
     </tbody>
   </table>
 
@@ -180,13 +174,15 @@ document.getElementById("gerar").addEventListener("click", async () => {
     }
 
     /* === TABELA NO PDF === */
-    const colCenters = [177.37, 307.39, 437.61, 567.88];
+    const colEndX = [177.37, 307.39, 437.61, 567.88];
+    const cellWidth = 130;
+    
     const firstRowY = 842 - 342.40;
     const rowSpacing = 13.98;
-
+    
     // construir tabela a partir do formulário
     const tabela = [];
-    for (let linha = 0; linha < 9; linha++) {
+    for (let linha = 0; linha < 8; linha++) {
       const row = [];
       for (let coluna = 0; coluna < 4; coluna++) {
         const input = document.getElementById(`t_${linha}_${coluna}`);
@@ -194,17 +190,18 @@ document.getElementById("gerar").addEventListener("click", async () => {
       }
       tabela.push(row);
     }
-
+    
     // desenhar tabela
     for (let linha = 0; linha < tabela.length; linha++) {
       for (let coluna = 0; coluna < 4; coluna++) {
         const texto = tabela[linha][coluna];
         if (!texto) continue;
-
+    
         const textWidth = font.widthOfTextAtSize(texto, fontSize);
-
+        const centerX = colEndX[coluna] - cellWidth / 2;
+    
         page.drawText(texto, {
-          x: colCenters[coluna] - textWidth / 2,
+          x: centerX - textWidth / 2,
           y: firstRowY - linha * rowSpacing,
           size: fontSize,
           font: font,
@@ -228,3 +225,4 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
