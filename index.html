@@ -56,8 +56,9 @@ document.getElementById("gerar").addEventListener("click", async () => {
       });
     }
 
-    // --- TABELA (centrada por largura real da célula) ---
+    // --- TABELA ---
 
+    // limites reais das células (px)
     const tableCellsX = [
       { x1: 22.84,  x2: 177.37 },
       { x1: 181.94, x2: 307.39 },
@@ -65,32 +66,42 @@ document.getElementById("gerar").addEventListener("click", async () => {
       { x1: 441.88, x2: 567.88 }
     ];
     
+    // posição vertical (px, origem topo-esquerdo, baseline)
     const tableStartY_px = 342.40;
     const rowHeight_px = 13.98;
     
+    // altura real da página PDF
     const { height } = page.getSize();
     
-    // exemplo (depois vem do formulário)
+    // dados de exemplo (mais tarde vêm do formulário)
     const tabela = [
       ["2026-02-25", "2", "1", "1"],
       ["2026-02-26", "3", "0.5", "1"],
     ];
     
+    // desenhar tabela
     for (let linha = 0; linha < tabela.length; linha++) {
       const yPx = tableStartY_px + linha * rowHeight_px;
       const yPdf = height - yPx;
     
       for (let coluna = 0; coluna < 4; coluna++) {
+        const texto = tabela[linha][coluna] || "";
         const cell = tableCellsX[coluna];
-        const cellWidth = cell.x2 - cell.x1;
     
-        page.drawText(tabela[linha][coluna] || "", {
-          x: cell.x1,
+        // centro da célula
+        const cellCenterX = (cell.x1 + cell.x2) / 2;
+    
+        // largura real do texto
+        const textWidth = font.widthOfTextAtSize(texto, fontSize);
+    
+        // X final centrado
+        const xPdf = cellCenterX - textWidth / 2;
+    
+        page.drawText(texto, {
+          x: xPdf,
           y: yPdf,
           size: fontSize,
           font: font,
-          maxWidth: cellWidth,
-          align: "center"
         });
       }
     }
@@ -111,6 +122,7 @@ document.getElementById("gerar").addEventListener("click", async () => {
 
 </body>
 </html>
+
 
 
 
